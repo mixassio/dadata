@@ -11,13 +11,13 @@ for i in range(0, len(root)):
     for j in range(0, len(root[i])):
         #print(root[i][j].tag, root[i][j].text)
         my_dict_local[root[i][j].tag] = root[i][j].text
-        # print(my_dict_local)
+        #print(my_dict_local)
     my_dict.append(my_dict_local)
 
 #for a in my_dict:
     #print(a)
 
-print(json.dumps(my_dict, indent=2, ensure_ascii=False))
+#print(json.dumps(my_dict, indent=2, ensure_ascii=False))
 
 f = open('./text1.txt', 'w')
 f.write(str(my_dict))

@@ -1,6 +1,6 @@
 import json
 import requests
-import time
+import time, os
 
 
 API_KEY = '90cc7f7cb74adc7e34bc3328e3a2e93813c4f662'
@@ -18,7 +18,6 @@ def suggest(query, resource):
     }
     r = requests.post(url, data=json.dumps(data), headers=headers)
     l = r.json()
-    print(json.dumps(l, indent=2, ensure_ascii=False))
     End_list = []
     for a,b in enumerate(l['suggestions']):
         my_dict = {}
@@ -27,7 +26,6 @@ def suggest(query, resource):
                 for k1,v1 in val.items():
                     if isinstance(v1, dict):
                         for k2, v2 in v1.items():
-                            print('------------------')
                             k3 = k1 + '-' + k2
                             my_dict[k3] = v2
                     else:
@@ -35,15 +33,49 @@ def suggest(query, resource):
             else:
                 my_dict[key] = val
         End_list.append(my_dict)
-    return End_list
+    print(json.dumps(End_list, indent=2, ensure_ascii=False))
+    return l
+
+
+# Функция по загрузке списка значений из файла в список
+def load_list_into_file(filepath):
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file_text:
+            list_ka = [line.strip('') for line in file_text]
+    my_dict = {}
+    my_list = []
+    for KA in list_ka:
+        a = KA[0:-1].split(';')
+        my_dict['id_sap'] = a[0]
+        my_dict['name_sap'] = a[1]
+        my_dict['date_sap'] = a[2]
+        my_dict['creater_sap'] = a[3]
+        my_dict['group_sap'] = a[4]
+        my_dict['inn_sap'] = a[5]
+        my_dict['kpp_sap'] = a[6]
+        my_list.append(my_dict.copy())
+    return my_list
+
+
+def data_mining(KA):
+    for i in KA:
+        l = suggest(i['inn_sap'], 'party')
+        i['ogrn'] = l[0]['ogrn']
+        i['postal_code'] = l[0]['value']
+        i['new_name'] = 'helllo'
+        print(i['inn_sap'], l[0]['ogrn'])
+    print(json.dumps(KA, indent=2, ensure_ascii=False))
 
 
 if __name__ == '__main__':
 
-    l = suggest('5262308874', 'party')
+    l = suggest('7708587205', 'party') #121505503564
+    #f = load_list_into_file('./test_60.csv')
+    #data_mining(f)
     print(json.dumps(l, indent=2, ensure_ascii=False))
-    tek = time.localtime(1415232000)
+    tek = time.localtime(1488326400)
     print('{}.{}.{}'.format(tek.tm_mday, tek.tm_mon, tek.tm_year))
+
 
 
 

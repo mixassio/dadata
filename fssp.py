@@ -1,24 +1,46 @@
-import xml.etree.ElementTree as etree
+
+import re
 import requests
-import json
+import lxml.etree as etree
+import sqlite3
 
-# r = requests.get('http://fssprus.ru/export/payment_receiver.xml')
-tree = etree.parse('./payment_receiver.xml')
-root = tree.getroot()
-my_dict = []
-for i in range(0, len(root)):
-    my_dict_local = {}
-    for j in range(0, len(root[i])):
-        #print(root[i][j].tag, root[i][j].text)
-        my_dict_local[root[i][j].tag] = root[i][j].text
-        #print(my_dict_local)
-    my_dict.append(my_dict_local)
+# get data FSSP
+raw_xml = requests.get('http://fssprus.ru/export/payment_receiver.xml').content
+parser_xml = etree.XMLParser(remove_blank_text=True)
+root_xml = etree.fromstring(raw_xml, parser_xml)
+#get list from FSSP
+my_list1 = []
+my_list2 = []
+for index, course in enumerate(root_xml):
+    for line in course:
+        my_list1.append(line.text)
+    my_list2.append(my_list1)
+    my_list1 = []
 
-#for a in my_dict:
-    #print(a)
+conn = sqlite3.connect('./KA.db')
+c = conn.cursor()
+#get replace and make my_name
+list_reduce = c.execute('select * from Reduce').fetchall()
+for id, line in enumerate(my_list2):
+    line.insert(3,line[2])
+    for red in list_reduce:
+        f = re.sub(red[0], red[1], line[3])
+        g = re.sub(r'(?<!\d\.\s)УФССП.*', '', f)
+        if g != '':
+            line[3] = g
+        else:
+            line[3] = f
+#get my_full_name
+for id, line in enumerate(my_list2):
+    list_UFK = c.execute('select * from regUFK where regions={}'.format(line[0])).fetchall()
+    my_full_name = '{}({} {}, л/с {})'.format(list_UFK[0][2], line[3], list_UFK[0][1], line[12])
+    line[4] = my_full_name
 
-#print(json.dumps(my_dict, indent=2, ensure_ascii=False))
+for line in my_list2:
+    print(line)
 
-f = open('./text1.txt', 'w')
-f.write(str(my_dict))
-f.close()
+c.execute("DROP TABLE  fssp")
+c.execute("CREATE TABLE fssp ( region CHAR, id CHAR, short_name CHAR, my_name CHAR, full_name CHAR, RKC CHAR, RS CHAR, BIK CHAR, INN CHAR, KPP CHAR, OKATO CHAR, OKTMO CHAR, LS CHAR)")
+for line in my_list2:
+    c.execute("insert into fssp values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", line)
+conn.commit()

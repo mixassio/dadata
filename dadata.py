@@ -33,7 +33,7 @@ def suggest(query, resource):
             else:
                 my_dict[key] = val
         End_list.append(my_dict)
-    print(json.dumps(End_list, indent=2, ensure_ascii=False))
+    #print(json.dumps(End_list, indent=2, ensure_ascii=False))
     return l
 
 
@@ -69,7 +69,7 @@ def data_mining(KA):
 
 if __name__ == '__main__':
 
-    l = suggest('7708587205', 'party') #121505503564
+    l = suggest('Алтайский край Барнаул, "пр.Красноармейский, 61А"', 'address') #121505503564
     #f = load_list_into_file('./test_60.csv')
     #data_mining(f)
     print(json.dumps(l, indent=2, ensure_ascii=False))

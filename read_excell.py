@@ -1,5 +1,5 @@
 import xlrd
-rb = xlrd.open_workbook('./test_excell2.xls',formatting_info=True)
+rb = xlrd.open_workbook('./test_excell1.xls',formatting_info=True)
 sheet = rb.sheet_by_index(0)
 my_list_od = []
 for rownum in range(11, sheet.nrows):#read first page with OD

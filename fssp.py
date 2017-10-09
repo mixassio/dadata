@@ -35,7 +35,7 @@ for id, line in enumerate(my_list2):
 #get my_full_name
 for id, line in enumerate(my_list2):
     list_UFK = c.execute('select * from regUFK where regions={}'.format(line[0])).fetchall()
-    my_full_name = '{}({} {}, л/с {})'.format(list_UFK[0][2], line[3], list_UFK[0][1], line[12])
+    my_full_name = '{} ({} {}, л/с {})'.format(list_UFK[0][2], line[3], list_UFK[0][1], line[12])
     line[4] = my_full_name
 """
 for line in my_list2:
@@ -46,5 +46,6 @@ print(len(my_list2))
 c.execute("DROP TABLE  fssp")
 c.execute("CREATE TABLE fssp (region CHAR, id CHAR, short_name CHAR, my_name CHAR, full_name CHAR, RKC CHAR, RS CHAR, BIK CHAR, INN CHAR, KPP CHAR, OKATO CHAR, OKTMO CHAR, LS CHAR, date_download)")
 for line in my_list2:
+    #print(line)
     c.execute("insert into fssp values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", line)
 conn.commit()

@@ -23,11 +23,14 @@ def suggest_kladr_house(query, resource):
     try:
         kladr = r.json()['suggestions'][0]['data']['kladr_id']
         house = str(r.json()['suggestions'][0]['data']['house'])
+        #u = ‘tru’ if True else ‘ne tru’
         print(kladr)
         #print(type(kladr), type(house))
-        return kladr + house
+        return kladr + ' ' + house
     except IndexError:
-        return ''
+        return 'IndexError'
+    except TypeError:
+        return 'TypeError'
 
 
 def get_index(text):
@@ -48,10 +51,11 @@ def true_id(a, b):
 
 raw_csv = requests.get('http://opendata.fssprus.ru/7709576929-osp/data-20170926-structure-20160226.csv')
 #raw_csv.content.decode('utf-8')
+print(raw_csv.encoding)
 raw_csv.encoding = 'utf-8'
-
-with open("test.csv", "wb") as code:
-    code.write(raw_csv.content)
+print(raw_csv.text)
+with open("test.csv", "w") as code:
+    code.write(raw_csv.text)
 
 
 with open('test.csv', 'rt') as f:
@@ -63,13 +67,13 @@ with open('test.csv', 'rt') as f:
 conn = sqlite3.connect('./KA.db')
 c = conn.cursor()
 
-c.execute("DROP TABLE  fssp_address1")
-c.execute("CREATE TABLE fssp_address1 (region CHAR, id CHAR, short_name CHAR, address CHAR, post_index CHAR, kladr_house CHAR, telephone CHAR)")
+#c.execute("DROP TABLE  fssp_address1")
+c.execute("CREATE TABLE fssp_address2 (region CHAR, id CHAR, short_name CHAR, address CHAR, post_index CHAR, kladr_house CHAR, telephone CHAR)")
 
 
 for row in m:
     print(row)
-    c.execute("insert into fssp_address1 values ( ?, ?, ?, ?, ?, ?, ?)", row)
+    c.execute("insert into fssp_address2 values ( ?, ?, ?, ?, ?, ?, ?)", row)
 
 conn.commit()
 """

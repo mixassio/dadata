@@ -3,7 +3,7 @@ import datetime
 import sqlite3
 
 DATE_TODAY = datetime.date.today()
-NAME_FILE = 'test2.xls'
+NAME_FILE = 'test1.xls'
 rb = xlrd.open_workbook(NAME_FILE,formatting_info=True)
 sheet = rb.sheet_by_index(0)
 my_list_od = []
@@ -38,7 +38,8 @@ for rownum in range(10, sheet.nrows):#read second page with BR
         'RU_bik': row[4],
         'ofk_br': row[5],
         'date_dl': DATE_TODAY,
-        'name_file': NAME_FILE
+        'name_file': NAME_FILE,
+        'status': 'new'
     }
     if my_dict['bik_ofk']:
         my_list_br.append(my_dict)
@@ -56,16 +57,17 @@ else:
         val.update({'ofk_br': ''})
         val.update({'date_dl': DATE_TODAY})
         val.update({'name_file': NAME_FILE})
+        val.update({'status': 'new'})
 
 #print(my_list_od)
 conn = sqlite3.connect('./KA.db')
 c = conn.cursor()
 
 #c.execute("DROP TABLE  applications")
-#c.execute("CREATE TABLE applications (id CHAR, short_name CHAR, group_KA CHAR, inn CHAR, okpo CHAR, kpp CHAR, ogrn CHAR, ofk CHAR, rbs CHAR, upk CHAR, okato CHAR, id_num CHAR, bik_ofk CHAR, ls_br CHAR, RU_bik CHAR, ofk_br CHAR, date_load CHAR, name_file CHAR)")
+#c.execute("CREATE TABLE applications (id CHAR, short_name CHAR, group_KA CHAR, inn CHAR, okpo CHAR, kpp CHAR, ogrn CHAR, ofk CHAR, rbs CHAR, upk CHAR, okato CHAR, id_num CHAR, bik_ofk CHAR, ls_br CHAR, RU_bik CHAR, ofk_br CHAR, date_load CHAR, name_file CHAR, status CHAR)")
 
 for row in my_list_od:
     print(row)
-    c.execute("insert into applications values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", list(row.values()))
+    c.execute("insert into applications values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", list(row.values()))
 
 conn.commit()
